@@ -1,0 +1,212 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#2b5876,#4e4376);
+    min-height:100vh;
+    padding:30px;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+}
+
+header{
+    text-align:center;
+    color:#fff;
+    margin-bottom:30px;
+}
+
+header h1{
+    font-size:34px;
+    font-weight:700;
+    margin-bottom:10px;
+}
+
+header p{
+    opacity:.9;
+    font-size:15px;
+}
+
+.card{
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(15px);
+    -webkit-backdrop-filter:blur(15px);
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:18px;
+    padding:22px;
+    margin-bottom:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+.card h2{
+    color:#fff;
+    margin-bottom:15px;
+    font-size:20px;
+}
+
+input[type=file]{
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:none;
+    background:#fff;
+    cursor:pointer;
+}
+
+.bgButtons{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+.bgBtn{
+    flex:1;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.bgBtn:hover{
+    transform:translateY(-3px);
+}
+
+.bgBtn.active{
+    background:#16a34a;
+    color:#fff;
+}
+
+button{
+    padding:14px 20px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    transition:.3s;
+}
+
+button:hover{
+    transform:translateY(-3px);
+}
+
+#removeBgBtn{
+    margin-top:15px;
+    width:100%;
+    background:#ff9800;
+    color:#fff;
+}
+
+.buttons{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+#generateSheet{
+    background:#2563eb;
+    color:#fff;
+    flex:1;
+}
+
+#downloadBtn{
+    background:#16a34a;
+    color:#fff;
+    flex:1;
+}
+
+#printBtn{
+    background:#ef4444;
+    color:#fff;
+    flex:1;
+}
+
+select{
+    width:100%;
+    padding:14px;
+    border-radius:10px;
+    border:none;
+    font-size:15px;
+}
+
+canvas{
+    display:block;
+    margin:auto;
+    max-width:100%;
+    background:#fff;
+    border-radius:12px;
+    border:2px solid rgba(255,255,255,.2);
+    box-shadow:0 10px 20px rgba(0,0,0,.25);
+}
+
+#sheetCanvas{
+    margin-top:20px;
+}
+
+#loading{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.65);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    z-index:999;
+}
+
+.loader{
+    width:65px;
+    height:65px;
+    border:6px solid #fff;
+    border-top:6px solid #00e5ff;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+}
+
+#loading p{
+    margin-top:20px;
+    color:#fff;
+    font-size:18px;
+}
+
+@keyframes spin{
+    from{
+        transform:rotate(0deg);
+    }
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@media(max-width:768px){
+
+    body{
+        padding:15px;
+    }
+
+    header h1{
+        font-size:26px;
+    }
+
+    .buttons{
+        flex-direction:column;
+    }
+
+    .bgButtons{
+        flex-direction:column;
+    }
+
+    button{
+        width:100%;
+    }
+
+}
