@@ -34,6 +34,9 @@ let zoom = 1;
 let offsetX = 0;
 let offsetY = 0;
 
+// Performance Optimization: તીવ્ર લેગ રોકવા માટે ફ્રેમ કંટ્રોલ વેરીએબલ
+let isTicking = false;
+
 // 1. Photo Upload Event
 uploadInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -46,7 +49,7 @@ uploadInput.addEventListener('change', (e) => {
                 resetSliders();
                 canvas.width = passportWidth;
                 canvas.height = passportHeight;
-                drawPassportPhoto();
+                requestUpdate();
             };
             originalImage.src = event.target.result;
         };
@@ -64,10 +67,21 @@ function resetSliders() {
     offsetY = 0;
 }
 
-// Sliders Event Listeners - સ્લાઈડર ફેરવતા જ ફોટો એડજસ્ટ થશે
-zoomRange.addEventListener('input', (e) => { zoom = parseFloat(e.target.value); drawPassportPhoto(); });
-moveXSlider.addEventListener('input', (e) => { offsetX = parseInt(e.target.value); drawPassportPhoto(); }); 
-moveYSlider.addEventListener('input', (e) => { offsetY = parseInt(e.target.value); drawPassportPhoto(); }); 
+// Optimization: સ્લાઈડર સ્મૂથ કરવા માટે RequestAnimationFrame ફંક્શન
+function requestUpdate() {
+    if (!isTicking) {
+        requestAnimationFrame(() => {
+            drawPassportPhoto();
+            isTicking = false;
+        });
+        isTicking = true;
+    }
+}
+
+// Sliders Event Listeners - હવે ગમે તેટલી સ્પીડમાં ફેરવશો તોય લેગ નહિ થાય
+zoomRange.addEventListener('input', (e) => { zoom = parseFloat(e.target.value); requestUpdate(); });
+moveXSlider.addEventListener('input', (e) => { offsetX = parseInt(e.target.value); requestUpdate(); }); 
+moveYSlider.addEventListener('input', (e) => { offsetY = parseInt(e.target.value); requestUpdate(); }); 
 
 // 2. Real AI Background Removal via remove.bg API
 removeBgBtn.addEventListener('click', async () => {
@@ -107,7 +121,7 @@ removeBgBtn.addEventListener('click', async () => {
             processedImageBlob = img; 
             canvas.width = passportWidth;
             canvas.height = passportHeight;
-            drawPassportPhoto();      
+            requestUpdate();      
             loading.style.display = 'none'; 
             alert("AI દ્વારા બેકગ્રાઉન્ડ સફળતાપૂર્વક રીમુવ થઈ ગયું છે!");
         };
@@ -128,7 +142,7 @@ bgButtons.forEach(btn => {
         currentBgColor = e.target.getAttribute('data-color');
         
         if (processedImageBlob) {
-            drawPassportPhoto(); 
+            requestUpdate(); 
         }
     });
 });
@@ -175,7 +189,7 @@ function drawPassportPhoto() {
     ctx.drawImage(processedImageBlob, dims.drawX, dims.drawY, dims.finalWidth, dims.finalHeight);
 }
 
-// 4. Generate Print Sheet (બીજી કોઈ રીત વગર સીધો જ નવો અને સાચો ફોટો બનાવશે)
+// 4. Generate Print Sheet
 generateSheetBtn.addEventListener('click', () => {
     if (!processedImageBlob) {
         alert("કૃપા કરીને પહેલા પાસપોર્ટ ફોટો તૈયાર કરો!");
@@ -206,14 +220,12 @@ generateSheetBtn.addEventListener('click', () => {
     sheetCtx.imageSmoothingEnabled = true;
     sheetCtx.imageSmoothingQuality = 'high';
 
-    // પ્રિન્ટ શીટ માટે ફોટાના સાચા બોક્સની સાઇઝ (તમારી પ્રિન્ટ ગ્રીડ મુજબ)
     const targetWidth = 413;
     const targetHeight = 531;
 
     const paddingX = (sheetCanvas.width - (cols * targetWidth)) / (cols + 1);
     const paddingY = (sheetCanvas.height - (rows * targetHeight)) / (rows + 1);
 
-    // પ્રિન્ટ શીટ માટે નવેસરથી સેમ ઝૂમ રેશિયો સાથે ગણતરી
     const dims = calculateDrawDimensions(processedImageBlob, targetWidth, targetHeight, zoom, offsetX, offsetY);
 
     for (let r = 0; r < rows; r++) {
@@ -221,21 +233,17 @@ generateSheetBtn.addEventListener('click', () => {
             const x = paddingX + c * (targetWidth + paddingX);
             const y = paddingY + r * (targetHeight + paddingY);
             
-            // ૧. પહેલા બેકગ્રાઉન્ડ કલર બોક્સ બનાવો
             sheetCtx.fillStyle = currentBgColor;
             sheetCtx.fillRect(x, y, targetWidth, targetHeight);
             
-            // ૨. ક્લિપિંગ વાપરો જેથી ફોટો બોક્સની બહાર ન નીકળે (ક્રોપ ન થાય)
             sheetCtx.save();
             sheetCtx.beginPath();
             sheetCtx.rect(x, y, targetWidth, targetHeight);
             sheetCtx.clip();
             
-            // ૩. ઓરિજિનલ ફોટો સીધો એ જ ઝૂમ પોઝિશન સાથે અંદર ડ્રો કરો
             sheetCtx.drawImage(processedImageBlob, x + dims.drawX, y + dims.drawY, dims.finalWidth, dims.finalHeight);
             sheetCtx.restore();
             
-            // ૪. બોર્ડર
             sheetCtx.strokeStyle = '#cccccc';
             sheetCtx.lineWidth = 2; 
             sheetCtx.strokeRect(x, y, targetWidth, targetHeight);
