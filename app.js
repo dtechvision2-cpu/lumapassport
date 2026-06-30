@@ -12,12 +12,15 @@ const downloadBtn = document.getElementById('downloadBtn');
 const printBtn = document.getElementById('printBtn');
 const loading = document.getElementById('loading');
 
+// configuration - અહિયાં તમારી remove.bg ની API કી મૂકો
+const REMOVE_BG_API_KEY = "YOUR_REMOVE_BG_API_KEY"; 
+
 // Global Variables
-let originalImage = null;       // ઓરિજિનલ અપલોડ કરેલો ફોટો
-let processedImageBlob = null;  // બેકગ્રાઉન્ડ રીમુવ થયા પછીનો ફોટો
-let currentBgColor = '#ffffff'; // ડિફોલ્ટ વ્હાઇટ કલર
-const passportWidth = 413;      // પાસપોર્ટ સાઈઝ પહોળાઈ
-const passportHeight = 531;     // પાસપોર્ટ સાઈઝ ઊંચાઈ
+let originalImage = null;       
+let processedImageBlob = null;  
+let currentBgColor = '#ffffff'; 
+const passportWidth = 413;      
+const passportHeight = 531;     
 
 // 1. Photo Upload Event
 uploadInput.addEventListener('change', (e) => {
@@ -27,7 +30,7 @@ uploadInput.addEventListener('change', (e) => {
         reader.onload = function(event) {
             originalImage = new Image();
             originalImage.onload = function() {
-                processedImageBlob = originalImage; // શરૂઆતમાં ઓરિજિનલ ફોટો જ બતાવશે
+                processedImageBlob = originalImage; 
                 drawPassportPhoto();
             };
             originalImage.src = event.target.result;
@@ -36,7 +39,7 @@ uploadInput.addEventListener('change', (e) => {
     }
 });
 
-// 2. Real AI Background Removal (imgly library)
+// 2. Real AI Background Removal via remove.bg API
 removeBgBtn.addEventListener('click', async () => {
     const file = uploadInput.files[0];
     if (!file) {
@@ -44,27 +47,44 @@ removeBgBtn.addEventListener('click', async () => {
         return;
     }
     
-    // લોડિંગ સ્ક્રીન ચાલુ કરો
+    if (REMOVE_BG_API_KEY === "YOUR_REMOVE_BG_API_KEY") {
+        alert("કૃપા કરીને પહેલા કોડમાં તમારી remove.bg API Key ઉમેરો!");
+        return;
+    }
+    
     loading.style.display = 'flex';
     
+    const formData = new FormData();
+    formData.append('image_file', file);
+    formData.append('size', 'auto');
+
     try {
-        // AI વડે બેકગ્રાઉન્ડ રીમુવ કરવાની પ્રોસેસ
-        const blob = await imglyRemoveBackground(file);
-        
-        // રીમુવ થયેલા ફોટોને ઈમેજ ઓબ્જેક્ટમાં કન્વર્ટ કરો
+        const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+            method: 'POST',
+            headers: {
+                'X-Api-Key': REMOVE_BG_API_KEY
+            },
+            body: formData
+        });
+
+        if (!response.ok) throw new Error('API Response Error');
+
+        const blob = await response.blob();
         const url = URL.createObjectURL(blob);
+        
         const img = new Image();
         img.onload = function() {
-            processedImageBlob = img; // હવે પ્રોસેસ થયેલો ફોટો સેવ થશે
-            drawPassportPhoto();      // નવો ફોટો ડ્રો કરો
-            loading.style.display = 'none'; // લોડિંગ બંધ
+            processedImageBlob = img; 
+            drawPassportPhoto();      
+            loading.style.display = 'none'; 
             alert("AI દ્વારા બેકગ્રાઉન્ડ સફળતાપૂર્વક રીમુવ થઈ ગયું છે!");
         };
         img.src = url;
+        
     } catch (error) {
         console.error(error);
         loading.style.display = 'none';
-        alert("બેકગ્રાઉન્ડ રીમુવ કરવામાં ભૂલ આવી. કૃપા કરીને ફરી ટ્રાય કરો.");
+        alert("બેકગ્રાઉન્ડ રીમુવ કરવામાં ભૂલ આવી. કૃપા કરીને ઇન્ટરનેટ કનેક્શન અથવા API કી ચેક કરો.");
     }
 });
 
@@ -76,23 +96,20 @@ bgButtons.forEach(btn => {
         currentBgColor = e.target.getAttribute('data-color');
         
         if (processedImageBlob) {
-            drawPassportPhoto(); // કલર બદલાતા જ ફોટો ફરી ડ્રો થશે
+            drawPassportPhoto(); 
         }
     });
 });
 
-// પાસપોર્ટ ફોટો ડ્રો કરવાનું મેઈન ફંક્શન
+// Draw Passport Photo Function
 function drawPassportPhoto() {
     if (!processedImageBlob) return;
 
-    // કેનવાસ સાફ કરો
     ctx.clearRect(0, 0, passportWidth, passportHeight);
 
-    // જે કલર સિલેક્ટ કર્યો હોય તે બેકગ્રાઉન્ડમાં ભરો (વ્હાઇટ કે બ્લુ)
     ctx.fillStyle = currentBgColor;
     ctx.fillRect(0, 0, passportWidth, passportHeight);
 
-    // ઓટોમેટિક ફોટો સાઈઝ એડજસ્ટમેન્ટ લોજિક
     const imgRatio = processedImageBlob.width / processedImageBlob.height;
     const canvasRatio = passportWidth / passportHeight;
     
@@ -110,11 +127,10 @@ function drawPassportPhoto() {
         drawY = (passportHeight - drawHeight) / 2;
     }
 
-    // બેકગ્રાઉન્ડ કલરની ઉપર પર્સનનો ફોટો ડ્રો કરો
     ctx.drawImage(processedImageBlob, drawX, drawY, drawWidth, drawHeight);
 }
 
-// 4. Generate Print Sheet (Multiple Photos Layout)
+// 4. Generate Print Sheet
 generateSheetBtn.addEventListener('click', () => {
     if (!processedImageBlob) {
         alert("કૃપા કરીને પહેલા પાસપોર્ટ ફોટો તૈયાર કરો!");
@@ -160,7 +176,7 @@ generateSheetBtn.addEventListener('click', () => {
     alert(`પ્રિન્ટ શીટ (${size}) તૈયાર છે! નીચે જુઓ.`);
 });
 
-// 5. Download PNG Function
+// 5. Download PNG
 downloadBtn.addEventListener('click', () => {
     if (!processedImageBlob) {
         alert("ડાઉનલોડ કરવા માટે કોઈ ફોટો નથી!");
