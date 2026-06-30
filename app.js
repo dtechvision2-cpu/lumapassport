@@ -12,8 +12,13 @@ const downloadBtn = document.getElementById('downloadBtn');
 const printBtn = document.getElementById('printBtn');
 const loading = document.getElementById('loading');
 
+// Sliders for Manual Adjustment
+const zoomRange = document.getElementById('zoomRange');
+const moveXSlider = document.getElementById('moveX');
+const moveYSlider = document.getElementById('moveY');
 
-const REMOVE_BG_API_KEY = "iEC5Uw4xYSwHwTXKWkvwFrec"; 
+// configuration - અહિયાં તમારી remove.bg ની API કી મૂકો
+const REMOVE_BG_API_KEY = "YOUR_REMOVE_BG_API_KEY"; 
 
 // Global Variables
 let originalImage = null;       
@@ -21,6 +26,11 @@ let processedImageBlob = null;
 let currentBgColor = '#ffffff'; 
 const passportWidth = 413;      
 const passportHeight = 531;     
+
+// Adjustment values
+let zoom = 1;
+let offsetX = 0;
+let offsetY = 0;
 
 // 1. Photo Upload Event
 uploadInput.addEventListener('change', (e) => {
@@ -31,6 +41,7 @@ uploadInput.addEventListener('change', (e) => {
             originalImage = new Image();
             originalImage.onload = function() {
                 processedImageBlob = originalImage; 
+                resetSliders();
                 drawPassportPhoto();
             };
             originalImage.src = event.target.result;
@@ -38,6 +49,21 @@ uploadInput.addEventListener('change', (e) => {
         reader.readAsDataURL(file);
     }
 });
+
+// Reset sliders on new image upload
+function resetSliders() {
+    zoomRange.value = 1;
+    moveXSlider.value = 0;
+    moveYSlider.value = 0;
+    zoom = 1;
+    offsetX = 0;
+    offsetY = 0;
+}
+
+// Sliders Event Listeners - સ્લાઈડર ફેરવતા જ ફોટો એડજસ્ટ થશે
+zoomRange.addEventListener('input', (e) => { zoom = parseFloat(e.target.value); drawPassportPhoto(); });
+moveXSlider.addEventListener('input', (e) => { offsetX = parseInt(e.target.value); drawPassportPhoto(); });
+moveYSlider.addEventListener('input', (e) => { offsetY = parseInt(e.target.value); drawPassportPhoto(); });
 
 // 2. Real AI Background Removal via remove.bg API
 removeBgBtn.addEventListener('click', async () => {
@@ -84,7 +110,7 @@ removeBgBtn.addEventListener('click', async () => {
     } catch (error) {
         console.error(error);
         loading.style.display = 'none';
-        alert("બેકગ્રાઉન્ડ રીમુવ કરવામાં ભૂલ આવી. કૃપા કરીને ઇન્ટરનેટ કનેક્શન અથવા API કી ચેક કરો.");
+        alert("બેકગ્રાઉન્ડ રીમુવ કરવામાં ભૂલ આવી.");
     }
 });
 
@@ -101,33 +127,40 @@ bgButtons.forEach(btn => {
     });
 });
 
-// Draw Passport Photo Function
+// Draw Passport Photo Function (With Zoom and Offset Adjustment)
 function drawPassportPhoto() {
     if (!processedImageBlob) return;
 
     ctx.clearRect(0, 0, passportWidth, passportHeight);
 
+    // Fill Background Color
     ctx.fillStyle = currentBgColor;
     ctx.fillRect(0, 0, passportWidth, passportHeight);
 
+    // Initial Base Aspect Ratio Fit Logic
     const imgRatio = processedImageBlob.width / processedImageBlob.height;
     const canvasRatio = passportWidth / passportHeight;
     
-    let drawWidth, drawHeight, drawX, drawY;
+    let baseWidth, baseHeight;
 
     if (imgRatio > canvasRatio) {
-        drawHeight = passportHeight;
-        drawWidth = passportHeight * imgRatio;
-        drawX = (passportWidth - drawWidth) / 2;
-        drawY = 0;
+        baseHeight = passportHeight;
+        baseWidth = passportHeight * imgRatio;
     } else {
-        drawWidth = passportWidth;
-        drawHeight = passportWidth / imgRatio;
-        drawX = 0;
-        drawY = (passportHeight - drawHeight) / 2;
+        baseWidth = passportWidth;
+        baseHeight = passportWidth / imgRatio;
     }
 
-    ctx.drawImage(processedImageBlob, drawX, drawY, drawWidth, drawHeight);
+    // Apply Zoom (Scale)
+    const finalWidth = baseWidth * zoom;
+    const finalHeight = baseHeight * zoom;
+
+    // Apply Center alignment + Manual Offset from sliders
+    const drawX = (passportWidth - finalWidth) / 2 + offsetX;
+    const drawY = (passportHeight - finalHeight) / 2 + offsetY;
+
+    // Draw the Image onto Canvas
+    ctx.drawImage(processedImageBlob, drawX, drawY, finalWidth, finalHeight);
 }
 
 // 4. Generate Print Sheet
