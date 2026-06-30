@@ -1,229 +1,339 @@
+/* --- Google Fonts & Reset --- */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-body{
-    background:linear-gradient(135deg,#2b5876,#4e4376);
-    min-height:100vh;
-    padding:30px;
+body {
+    /* આધુનિક સાયબર-પંક / ડાર્ક નિયોન વાઇબ ગ્રેડિયન્ટ */
+    background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+    color: #f8fafc;
+    overflow-x: hidden;
 }
 
-.container{
-    max-width:1100px;
-    margin:auto;
+.container {
+    max-width: 1000px;
+    margin: auto;
 }
 
-header{
-    text-align:center;
-    color:#fff;
-    margin-bottom:30px;
+/* --- Header Section --- */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeInDown 0.8s ease-out;
 }
 
-header h1{
-    font-size:34px;
-    font-weight:700;
-    margin-bottom:10px;
+header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 38px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #38bdf8 0%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
 }
 
-header p{
-    opacity:.9;
-    font-size:15px;
+header h1 i {
+    -webkit-text-fill-color: #38bdf8;
+    filter: drop-shadow(0 0 12px rgba(56, 189, 248, 0.5));
 }
 
-.card{
-    background:rgba(255,255,255,.15);
-    backdrop-filter:blur(15px);
-    -webkit-backdrop-filter:blur(15px);
-    border:1px solid rgba(255,255,255,.25);
-    border-radius:18px;
-    padding:22px;
-    margin-bottom:25px;
-    box-shadow:0 10px 30px rgba(0,0,0,.2);
+header p {
+    color: #94a3b8;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
 }
 
-.card h2{
-    color:#fff;
-    margin-bottom:15px;
-    font-size:20px;
+/* --- Premium Glassmorphism Card --- */
+.card {
+    background: rgba(30, 41, 59, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 26px;
+    margin-bottom: 28px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-input[type=file]{
-    width:100%;
-    padding:14px;
-    border-radius:10px;
-    border:none;
-    background:#fff;
-    cursor:pointer;
+.card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(56, 189, 248, 0.2);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4), 
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-.bgButtons{
-    display:flex;
-    gap:15px;
-    flex-wrap:wrap;
+.card h2, .card h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    color: #f1f5f9;
+    margin-bottom: 18px;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
 }
 
-.bgBtn{
-    flex:1;
-    padding:14px;
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-    font-size:16px;
-    font-weight:600;
-    transition:.3s;
+/* --- Inputs & Select --- */
+input[type=file] {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: 2px dashed rgba(255, 255, 255, 0.15);
+    background: rgba(15, 23, 42, 0.6);
+    color: #94a3b8;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
-.bgBtn:hover{
-    transform:translateY(-3px);
+input[type=file]:hover {
+    border-color: #38bdf8;
+    background: rgba(15, 23, 42, 0.8);
+    color: #f1f5f9;
 }
 
-.bgBtn.active{
-    background:#16a34a;
-    color:#fff;
+select {
+    width: 100%;
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #0f172a;
+    color: #f1f5f9;
+    font-size: 15px;
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
-button{
-    padding:14px 20px;
-    border:none;
-    border-radius:12px;
-    cursor:pointer;
-    font-size:15px;
-    font-weight:600;
-    transition:.3s;
+select:focus {
+    border-color: #c084fc;
+    box-shadow: 0 0 0 3px rgba(192, 132, 252, 0.25);
 }
 
-button:hover{
-    transform:translateY(-3px);
+/* --- Sliders Area (Photo Adjustment) --- */
+.photo-controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
 }
 
-#removeBgBtn{
-    margin-top:15px;
-    width:100%;
-    background:#ff9800;
-    color:#fff;
+input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    outline: none;
 }
 
-.buttons{
-    display:flex;
-    gap:15px;
-    flex-wrap:wrap;
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #38bdf8;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+    transition: 0.2s;
 }
 
-#generateSheet{
-    background:#2563eb;
-    color:#fff;
-    flex:1;
+input[type=range]::-webkit-slider-thumb:hover {
+    background: #c084fc;
+    transform: scale(1.15);
 }
 
-#downloadBtn{
-    background:#16a34a;
-    color:#fff;
-    flex:1;
+/* --- Buttons Layout & Styling --- */
+.bgButtons, .buttons {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
 }
 
-#printBtn{
-    background:#ef4444;
-    color:#fff;
-    flex:1;
+button {
+    padding: 16px 24px;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-select{
-    width:100%;
-    padding:14px;
-    border-radius:10px;
-    border:none;
-    font-size:15px;
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.25);
 }
 
-canvas{
-    display:block;
-    margin:auto;
-    max-width:100%;
-    background:#fff;
-    border-radius:12px;
-    border:2px solid rgba(255,255,255,.2);
-    box-shadow:0 10px 20px rgba(0,0,0,.25);
+button:active {
+    transform: translateY(-1px);
 }
 
-#sheetCanvas{
-    margin-top:20px;
+/* Specific Buttons Styling */
+#removeBgBtn {
+    margin-top: 18px;
+    width: 100%;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
 }
 
-#loading{
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.65);
-    display:none;
-    align-items:center;
-    justify-content:center;
-    flex-direction:column;
-    z-index:999;
+.bgBtn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.08);
+    color: #f1f5f9;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.loader{
-    width:65px;
-    height:65px;
-    border:6px solid #fff;
-    border-top:6px solid #00e5ff;
-    border-radius:50%;
-    animation:spin 1s linear infinite;
+.bgBtn:hover {
+    background: rgba(255, 255, 255, 0.15);
 }
 
-#loading p{
-    margin-top:20px;
-    color:#fff;
-    font-size:18px;
+.bgBtn.active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    border: none;
 }
 
-@keyframes spin{
-    from{
-        transform:rotate(0deg);
-    }
-    to{
-        transform:rotate(360deg);
-    }
+#generateSheet {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: #fff;
+    flex: 1;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
 }
 
-@media(max-width:768px){
-
-    body{
-        padding:15px;
-    }
-
-    header h1{
-        font-size:26px;
-    }
-
-    .buttons{
-        flex-direction:column;
-    }
-
-    .bgButtons{
-        flex-direction:column;
-    }
-
-    button{
-        width:100%;
-    }
-
+#downloadBtn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #fff;
+    flex: 1;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
 }
 
-/* --- નવું અને મોર્ડન પ્રીમિયમ ફૂટર --- */
+#printBtn {
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    color: #fff;
+    flex: 1;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+/* --- Canvas Previews --- */
+canvas {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+    background: #0f172a;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+#sheetCanvas {
+    margin-top: 24px;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* --- Cool Loading Screen --- */
+#loading {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 999;
+}
+
+.loader {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(56, 189, 248, 0.1);
+    border-top: 5px solid #38bdf8;
+    border-radius: 50%;
+    animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.4));
+}
+
+#loading p {
+    margin-top: 24px;
+    color: #f1f5f9;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+/* --- Footer - Professional Developer Tag --- */
 footer {
     text-align: center;
-    margin-top: 40px;
-    padding: 20px 15px;
-    color: rgba(255, 255, 255, 0.7); /* ગ્રેડિયન્ટ બેકગ્રાઉન્ડ પર ટેક્સ્ટ ચોખ્ખો વંચાશે */
+    margin-top: 50px;
+    padding: 24px 15px;
+    color: rgba(148, 163, 184, 0.7);
     font-size: 14px;
-    border-top: 1px solid rgba(255, 255, 255, 0.15); /* લાઈટ પ્રીમિયમ બોર્ડર */
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
     letter-spacing: 0.5px;
+    line-height: 1.6;
 }
 
 footer strong {
-    color: #ff9800; /* ડેવલપરનું નામ હાઇલાઇટ કરવા માટે ઓરેન્જ ગોલ્ડ કલર */
+    color: #38bdf8;
     font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+}
+
+/* --- Animations --- */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Responsive Adjustments --- */
+@media(max-width:768px){
+    body {
+        padding: 20px 12px;
+    }
+
+    header h1 {
+        font-size: 28px;
+    }
+
+    .buttons, .bgButtons {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    button {
+        width: 100%;
+    }
 }
