@@ -210,13 +210,20 @@ canvas{
     }
 
 }
+
+/* --- નવું અને મોર્ડન પ્રીમિયમ ફૂટર --- */
 footer {
     text-align: center;
-    margin-top: 30px;
-    padding: 15px;
-    color: #555;
+    margin-top: 40px;
+    padding: 20px 15px;
+    color: rgba(255, 255, 255, 0.7); /* ગ્રેડિયન્ટ બેકગ્રાઉન્ડ પર ટેક્સ્ટ ચોખ્ખો વંચાશે */
     font-size: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15); /* લાઈટ પ્રીમિયમ બોર્ડર */
+    letter-spacing: 0.5px;
 }
+
 footer strong {
-    color: #007bff; /* તમારા કલર થીમ પ્રમાણે બદલી શકો છો */
+    color: #ff9800; /* ડેવલપરનું નામ હાઇલાઇટ કરવા માટે ઓરેન્જ ગોલ્ડ કલર */
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
