@@ -210,3 +210,13 @@ canvas{
     }
 
 }
+footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 15px;
+    color: #555;
+    font-size: 14px;
+}
+footer strong {
+    color: #007bff; /* તમારા કલર થીમ પ્રમાણે બદલી શકો છો */
+}
