@@ -18,7 +18,7 @@ const moveXSlider = document.getElementById('moveX');
 const moveYSlider = document.getElementById('moveY');
 
 // configuration - અહિયાં તમારી remove.bg ની API કી મૂકો
-const REMOVE_BG_API_KEY = "YOUR_REMOVE_BG_API_KEY"; 
+const REMOVE_BG_API_KEY = "iEC5Uw4xYSwHwTXKWkvwFrec"; 
 
 // Global Variables
 let originalImage = null;       
