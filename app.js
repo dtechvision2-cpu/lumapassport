@@ -25,11 +25,11 @@ let originalImage = null;
 let processedImageBlob = null;  
 let currentBgColor = '#ffffff'; 
 
-// ક્વોલિટી સુધારવા માટે બેઝ સાઇઝને 3x વધારી દીધી છે (High Definition)
-const passportWidth = 413 * 3;  // 1239 px
-const passportHeight = 531 * 3; // 1593 px
+// પાસપોર્ટ સાઇઝની HD રેઝોલ્યુશન સાઇઝ (3x)
+const passportWidth = 1239;  
+const passportHeight = 1593; 
 
-// CSS Display Size (ડિસ્પ્લે નાની દેખાશે પણ અંદર ફોટો HD બનશે)
+// HTML ડિસ્પ્લે સાઇઝ ફિક્સ કરી દીધી જેથી સ્ક્રીન પર ફોટો મોટો ન થઈ જાય
 canvas.style.width = "413px";
 canvas.style.height = "531px";
 
@@ -69,10 +69,11 @@ function resetSliders() {
     offsetY = 0;
 }
 
-// Sliders Event Listeners - સ્લાઈડર ફેરવતા જ ફોટો એડજસ્ટ થશે
+// Sliders Event Listeners - સ્લાઈડર ફેરવતા જ HD સ્કેલ મુજબ ફોટો એડજસ્ટ થશે
 zoomRange.addEventListener('input', (e) => { zoom = parseFloat(e.target.value); drawPassportPhoto(); });
-moveXSlider.addEventListener('input', (e) => { offsetX = parseInt(e.target.value) * 3; drawPassportPhoto(); }); // Multiplied by 3 for HD resolution
-moveYSlider.addEventListener('input', (e) => { offsetY = parseInt(e.target.value) * 3; drawPassportPhoto(); }); // Multiplied by 3 for HD resolution
+// સ્લાઇડરની વેલ્યુને પણ 3 વડે ગુણી દીધી જેથી પ્રિવ્યૂ અને અસલી કેનવાસ મેચ થાય
+moveXSlider.addEventListener('input', (e) => { offsetX = parseInt(e.target.value) * 3; drawPassportPhoto(); }); 
+moveYSlider.addEventListener('input', (e) => { offsetY = parseInt(e.target.value) * 3; drawPassportPhoto(); }); 
 
 // 2. Real AI Background Removal via remove.bg API
 removeBgBtn.addEventListener('click', async () => {
@@ -210,7 +211,7 @@ generateSheetBtn.addEventListener('click', () => {
     sheetCtx.imageSmoothingEnabled = true;
     sheetCtx.imageSmoothingQuality = 'high';
 
-    // ફોટા વચ્ચે જગ્યા સેટ કરવા માટેની ગણતરી (HD પાસપોર્ટ સાઇઝ મુજબ)
+    // ફોટા વચ્ચે જગ્યા સેટ કરવા માટેની ગણતરી
     const paddingX = (sheetCanvas.width - (cols * passportWidth)) / (cols + 1);
     const paddingY = (sheetCanvas.height - (rows * passportHeight)) / (rows + 1);
 
@@ -219,11 +220,11 @@ generateSheetBtn.addEventListener('click', () => {
             const x = paddingX + c * (passportWidth + paddingX);
             const y = paddingY + r * (passportHeight + paddingY);
             
-            // HD કેનવાસ માંથી સીધો ફોટો પ્રિન્ટ શીટ પર ડ્રો થશે (ક્વોલિટી બગડશે નહિ)
-            sheetCtx.drawImage(canvas, x, y, passportWidth, passportHeight);
+            // હવે પ્રિવ્યૂમાં જેવું કેનવાસ દેખાશે, તેવું જ બેઠું પ્રિન્ટ શીટ પર ડ્રો થશે
+            sheetCtx.drawImage(canvas, 0, 0, passportWidth, passportHeight, x, y, passportWidth, passportHeight);
             
             sheetCtx.strokeStyle = '#cccccc';
-            sheetCtx.lineWidth = 3; // બોર્ડર થોડી જાડી કરી જેથી પ્રિન્ટમાં સારી દેખાય
+            sheetCtx.lineWidth = 3; 
             sheetCtx.strokeRect(x, y, passportWidth, passportHeight);
         }
     }
@@ -233,26 +234,24 @@ generateSheetBtn.addEventListener('click', () => {
 
 // 5. Download PNG (Full Quality)
 downloadBtn.addEventListener('click', () => {
-    if (!processedImageBlob) {
-        alert("ડાઉનલોડ કરવા માટે કોઈ ફોટો નથી!");
+    if (!sheetCanvas.width || sheetCanvas.width === 0) {
+        alert("ડાઉનલોડ કરવા માટે પહેલા 'Generate Print Sheet' બટન પર ક્લિક કરો!");
         return;
     }
     const link = document.createElement('a');
     link.download = 'passport_print_sheet.png';
-    // 1.0 એટલે મહત્તમ 100% ક્વોલિટી
     link.href = sheetCanvas.toDataURL('image/png', 1.0); 
     link.click();
 });
 
 // 6. Print Function (High Resolution Window Print)
 printBtn.addEventListener('click', () => {
-    if (!processedImageBlob) {
-        alert("પ્રિન્ટ કરવા માટે કોઈ શીટ જનરેટ થયેલ નથી!");
+    if (!sheetCanvas.width || sheetCanvas.width === 0) {
+        alert("પ્રિન્ટ કરવા માટે પહેલા 'Generate Print Sheet' બટન પર ક્લિક કરો!");
         return;
     }
     const dataUrl = sheetCanvas.toDataURL('image/png', 1.0);
     
-    // પ્રિન્ટ વિન્ડોમાં ઈમેજ ફૂલ ક્વોલિટીમાં સેટ કરવી
     const windowContent = '<!DOCTYPE html><html><head><title>Print Passport</title>' +
         '<style>@page { size: auto; margin: 0mm; } body { margin: 0; display: flex; justify-content: center; align-items: center; }</style>' +
         '</head><body>' + 
@@ -264,7 +263,6 @@ printBtn.addEventListener('click', () => {
     printWindow.document.write(windowContent);
     printWindow.document.close();
     
-    // ફોટો બરાબર લોડ થાય તે માટે 500ms નો વેઇટ રાખ્યો છે
     printWindow.focus();
     setTimeout(() => {
         printWindow.print();
