@@ -12,8 +12,8 @@ const downloadBtn = document.getElementById('downloadBtn');
 const printBtn = document.getElementById('printBtn');
 const loading = document.getElementById('loading');
 
-// configuration - અહિયાં તમારી remove.bg ની API કી મૂકો
-const REMOVE_BG_API_KEY = "YOUR_REMOVE_BG_API_KEY"; 
+
+const REMOVE_BG_API_KEY = "iEC5Uw4xYSwHwTXKWkvwFrec"; 
 
 // Global Variables
 let originalImage = null;       
