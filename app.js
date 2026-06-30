@@ -25,13 +25,9 @@ let originalImage = null;
 let processedImageBlob = null;  
 let currentBgColor = '#ffffff'; 
 
-// પાસપોર્ટ સાઇઝની HD રેઝોલ્યુશન સાઇઝ (3x)
-const passportWidth = 1239;  
-const passportHeight = 1593; 
-
-// HTML ડિસ્પ્લે સાઇઝ ફિક્સ કરી દીધી જેથી સ્ક્રીન પર ફોટો મોટો ન થઈ જાય
-canvas.style.width = "413px";
-canvas.style.height = "531px";
+// પાસપોર્ટ સાઇઝની સ્ટાન્ડર્ડ પ્રિવ્યૂ સાઇઝ
+const passportWidth = 413;  
+const passportHeight = 531; 
 
 // Adjustment values
 let zoom = 1;
@@ -48,7 +44,6 @@ uploadInput.addEventListener('change', (e) => {
             originalImage.onload = function() {
                 processedImageBlob = originalImage; 
                 resetSliders();
-                // કેનવાસની અસલી સાઇઝ HD સેટ કરવી
                 canvas.width = passportWidth;
                 canvas.height = passportHeight;
                 drawPassportPhoto();
@@ -69,11 +64,10 @@ function resetSliders() {
     offsetY = 0;
 }
 
-// Sliders Event Listeners - સ્લાઈડર ફેરવતા જ HD સ્કેલ મુજબ ફોટો એડજસ્ટ થશે
+// Sliders Event Listeners - સ્લાઈડર ફેરવતા જ ફોટો એડજસ્ટ થશે
 zoomRange.addEventListener('input', (e) => { zoom = parseFloat(e.target.value); drawPassportPhoto(); });
-// સ્લાઇડરની વેલ્યુને પણ 3 વડે ગુણી દીધી જેથી પ્રિવ્યૂ અને અસલી કેનવાસ મેચ થાય
-moveXSlider.addEventListener('input', (e) => { offsetX = parseInt(e.target.value) * 3; drawPassportPhoto(); }); 
-moveYSlider.addEventListener('input', (e) => { offsetY = parseInt(e.target.value) * 3; drawPassportPhoto(); }); 
+moveXSlider.addEventListener('input', (e) => { offsetX = parseInt(e.target.value); drawPassportPhoto(); }); 
+moveYSlider.addEventListener('input', (e) => { offsetY = parseInt(e.target.value); drawPassportPhoto(); }); 
 
 // 2. Real AI Background Removal via remove.bg API
 removeBgBtn.addEventListener('click', async () => {
@@ -139,13 +133,35 @@ bgButtons.forEach(btn => {
     });
 });
 
-// Draw Passport Photo Function (With High Quality Smooth Settings)
+// Helper Function: ફોટો ડ્રો કરવાની ગણતરી (બંને કેનવાસ માટે સેમ રહેશે)
+function calculateDrawDimensions(img, targetW, targetH, currentZoom, currentX, currentY) {
+    const imgRatio = img.width / img.height;
+    const canvasRatio = targetW / targetH;
+    
+    let baseWidth, baseHeight;
+
+    if (imgRatio > canvasRatio) {
+        baseHeight = targetH;
+        baseWidth = targetH * imgRatio;
+    } else {
+        baseWidth = targetW;
+        baseHeight = targetW / imgRatio;
+    }
+
+    const finalWidth = baseWidth * currentZoom;
+    const finalHeight = baseHeight * currentZoom;
+
+    const drawX = (targetW - finalWidth) / 2 + currentX;
+    const drawY = (targetH - finalHeight) / 2 + currentY;
+
+    return { drawX, drawY, finalWidth, finalHeight };
+}
+
+// Draw Passport Photo Function (Preview Canvas)
 function drawPassportPhoto() {
     if (!processedImageBlob) return;
 
     ctx.clearRect(0, 0, passportWidth, passportHeight);
-
-    // High Quality rendering settings
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
@@ -153,33 +169,13 @@ function drawPassportPhoto() {
     ctx.fillStyle = currentBgColor;
     ctx.fillRect(0, 0, passportWidth, passportHeight);
 
-    // Initial Base Aspect Ratio Fit Logic
-    const imgRatio = processedImageBlob.width / processedImageBlob.height;
-    const canvasRatio = passportWidth / passportHeight;
-    
-    let baseWidth, baseHeight;
+    // ગણતરી મેળવો
+    const dims = calculateDrawDimensions(processedImageBlob, passportWidth, passportHeight, zoom, offsetX, offsetY);
 
-    if (imgRatio > canvasRatio) {
-        baseHeight = passportHeight;
-        baseWidth = passportHeight * imgRatio;
-    } else {
-        baseWidth = passportWidth;
-        baseHeight = passportWidth / imgRatio;
-    }
-
-    // Apply Zoom (Scale)
-    const finalWidth = baseWidth * zoom;
-    const finalHeight = baseHeight * zoom;
-
-    // Apply Center alignment + Manual Offset from sliders
-    const drawX = (passportWidth - finalWidth) / 2 + offsetX;
-    const drawY = (passportHeight - finalHeight) / 2 + offsetY;
-
-    // Draw the Image onto Canvas
-    ctx.drawImage(processedImageBlob, drawX, drawY, finalWidth, finalHeight);
+    ctx.drawImage(processedImageBlob, dims.drawX, dims.drawY, dims.finalWidth, dims.finalHeight);
 }
 
-// 4. Generate Print Sheet
+// 4. Generate Print Sheet (બીજી કોઈ રીત વગર સીધો જ નવો અને સાચો ફોટો બનાવશે)
 generateSheetBtn.addEventListener('click', () => {
     if (!processedImageBlob) {
         alert("કૃપા કરીને પહેલા પાસપોર્ટ ફોટો તૈયાર કરો!");
@@ -207,32 +203,49 @@ generateSheetBtn.addEventListener('click', () => {
     sheetCtx.fillStyle = '#ffffff';
     sheetCtx.fillRect(0, 0, sheetCanvas.width, sheetCanvas.height);
 
-    // sheet માટે પણ હાઇ ક્વોલિટી સેટિંગ્સ
     sheetCtx.imageSmoothingEnabled = true;
     sheetCtx.imageSmoothingQuality = 'high';
 
-    // ફોટા વચ્ચે જગ્યા સેટ કરવા માટેની ગણતરી
-    const paddingX = (sheetCanvas.width - (cols * passportWidth)) / (cols + 1);
-    const paddingY = (sheetCanvas.height - (rows * passportHeight)) / (rows + 1);
+    // પ્રિન્ટ શીટ માટે ફોટાના સાચા બોક્સની સાઇઝ (તમારી પ્રિન્ટ ગ્રીડ મુજબ)
+    const targetWidth = 413;
+    const targetHeight = 531;
+
+    const paddingX = (sheetCanvas.width - (cols * targetWidth)) / (cols + 1);
+    const paddingY = (sheetCanvas.height - (rows * targetHeight)) / (rows + 1);
+
+    // પ્રિન્ટ શીટ માટે નવેસરથી સેમ ઝૂમ રેશિયો સાથે ગણતરી
+    const dims = calculateDrawDimensions(processedImageBlob, targetWidth, targetHeight, zoom, offsetX, offsetY);
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            const x = paddingX + c * (passportWidth + paddingX);
-            const y = paddingY + r * (passportHeight + paddingY);
+            const x = paddingX + c * (targetWidth + paddingX);
+            const y = paddingY + r * (targetHeight + paddingY);
             
-            // હવે પ્રિવ્યૂમાં જેવું કેનવાસ દેખાશે, તેવું જ બેઠું પ્રિન્ટ શીટ પર ડ્રો થશે
-            sheetCtx.drawImage(canvas, 0, 0, passportWidth, passportHeight, x, y, passportWidth, passportHeight);
+            // ૧. પહેલા બેકગ્રાઉન્ડ કલર બોક્સ બનાવો
+            sheetCtx.fillStyle = currentBgColor;
+            sheetCtx.fillRect(x, y, targetWidth, targetHeight);
             
+            // ૨. ક્લિપિંગ વાપરો જેથી ફોટો બોક્સની બહાર ન નીકળે (ક્રોપ ન થાય)
+            sheetCtx.save();
+            sheetCtx.beginPath();
+            sheetCtx.rect(x, y, targetWidth, targetHeight);
+            sheetCtx.clip();
+            
+            // ૩. ઓરિજિનલ ફોટો સીધો એ જ ઝૂમ પોઝિશન સાથે અંદર ડ્રો કરો
+            sheetCtx.drawImage(processedImageBlob, x + dims.drawX, y + dims.drawY, dims.finalWidth, dims.finalHeight);
+            sheetCtx.restore();
+            
+            // ૪. બોર્ડર
             sheetCtx.strokeStyle = '#cccccc';
-            sheetCtx.lineWidth = 3; 
-            sheetCtx.strokeRect(x, y, passportWidth, passportHeight);
+            sheetCtx.lineWidth = 2; 
+            sheetCtx.strokeRect(x, y, targetWidth, targetHeight);
         }
     }
     
     alert(`પ્રિન્ટ શીટ (${size}) તૈયાર છે! નીચે જુઓ.`);
 });
 
-// 5. Download PNG (Full Quality)
+// 5. Download PNG (Full HD Quality)
 downloadBtn.addEventListener('click', () => {
     if (!sheetCanvas.width || sheetCanvas.width === 0) {
         alert("ડાઉનલોડ કરવા માટે પહેલા 'Generate Print Sheet' બટન પર ક્લિક કરો!");
